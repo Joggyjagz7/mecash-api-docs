@@ -4,7 +4,7 @@
 
 ### Overview
 The POST `/api/v1/payments` endpoint allows users to initiate a cross-border payment between a sender and a recipient. 
-This API enables seamless money transfers internationally while ensuring secure and efficient transactions.
+With this API, developers can programmatically initiate transactions, validate recipient details, and track payment statuses.
 
 ## Request
 
@@ -69,7 +69,6 @@ Here's what each field means:
 | **recipient.name** | The full name of the recipient. |
 | **recipient.country** | The country where the recipient is located. |
 
----
 
 #### Error Response (HTTP 400)
 If there’s an issue with the request, the server responds with a 400 Bad Request status code and a JSON object explaining the error.
@@ -89,4 +88,83 @@ Here’s what each field means:
 | **error** | A code indicating the type of error (e.g., `INVALID_REQUEST`). |
 | **message** | A human-readable message explaining the error `(Invalid bank code for the recipient).` |
 
----
+
+#### Other Error Codes and How to Troubleshoot it
+Here are some common errors you might encounter:
+
+| HTTP Status Code | Error Code | Description |
+|------------------|------------|-------------|
+| **400** | `INVALID_REQUEST` | The request is missing required fields or contains invalid data. |
+| **401** | `UNAUTHORIZED` | The API key is missing or incorrect or inactive |
+| **403** | `FORBIDDEN` | You don’t have permission to perform this transaction. |
+| **404** | `NOT_FOUND` | The recipient’s bank or account could not be found. |
+| **429** | `RATE_LIMIT_EXCEEDED` |  Too many requests. Slow down your API calls. |
+| **500** | `INTERNAL_ERROR` | Something went wrong on the server. Contact support |
+
+--- 
+
+
+### Code Examples
+
+#### cURL Example
+```cURL
+curl -X POST https://api.mecash.com/api/v1/payments \
+-H "Authorization: Bearer your_api_key" \
+-H "Content-Type: application/json" \
+-d '{
+  "amount": 100.00,
+  "currency": "USD",
+  "sender": {
+    "name": "John Doe",
+    "email": "john.doe@x.com"
+  },
+  "recipient": {
+    "name": "Jane Smith",
+    "accountNumber": "0987654321",
+    "bankCode": "XYZ456",
+    "country": "USA"
+  },
+  "reference": "INV-12345"
+}'
+```
+
+#### Python Example
+```Python
+
+import requests
+
+url = "https://api.mecash.com/api/v1/payments"
+headers = {
+    "Authorization": "Bearer your_api_key",
+    "Content-Type": "application/json"
+}
+
+payload = {
+    "amount": 100.00,
+    "currency": "USD",
+    "sender": {
+        "name": "John Doe",
+        "email": "john.doe@x.com"
+    },
+    "recipient": {
+        "name": "Jane Smith",
+        "accountNumber": "0987654321",
+        "bankCode": "XYZ456",
+        "country": "USA"
+    },
+    "reference": "INV-12345"
+}
+
+response = requests.post(url, json=payload, headers=headers)
+print(response.json())
+```
+----
+
+### Additional Notes
+- Transactions typically process within 30 seconds.
+- Ensure all requests are idempotent by using a unique reference field.
+- You can test the API using Postman or Swagger UI.
+
+For further assistance, visit the meCash API Developer Portal.
+
+
